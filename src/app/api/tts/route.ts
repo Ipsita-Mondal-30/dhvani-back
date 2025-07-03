@@ -28,24 +28,12 @@ export async function POST(request: NextRequest) {
     const gcpApiKey = process.env.GCP_API_KEY;
     
     if (!gcpApiKey) {
-      // Return a mock response for development
-      console.log('⚠️ [TTS API] No GCP API key found, returning mock response');
-      
-      // Create a minimal MP3 header for a silent audio file
-      const mockAudioData = Buffer.from([
-        0xFF, 0xFB, 0x90, 0x00, // MP3 header
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-      ]);
-      
-      return new NextResponse(mockAudioData, {
-        status: 200,
-        headers: {
-          'Content-Type': 'audio/mpeg',
-          'Content-Length': mockAudioData.length.toString(),
-          'Cache-Control': 'public, max-age=3600',
-        },
-      });
+      // Return an error instead of mock data to make it clear TTS is not configured
+      console.log('⚠️ [TTS API] No GCP API key found');
+      return NextResponse.json(
+        { error: 'TTS service not configured. Please set up GCP_API_KEY environment variable.' },
+        { status: 503 }
+      );
     }
 
     // Use Google Cloud TTS REST API
