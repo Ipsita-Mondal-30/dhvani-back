@@ -10,6 +10,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@google-cloud/text-to-speech": "^6.1.0",
     "@prisma/client": "^6.11.1",
     "@supabase/supabase-js": "^2.50.3",
     "@types/multer": "^2.0.0",
