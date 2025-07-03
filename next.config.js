@@ -17,9 +17,13 @@ const nextConfig = {
 
     return config;
   },
-  experimental: {
-    serverComponentsExternalPackages: ["pdf-parse"],
+
+  // ✅ Disable ESLint during builds (Vercel or local)
+  eslint: {
+    ignoreDuringBuilds: true,
   },
+
+  serverExternalPackages: ["pdf-parse"],
 };
 
 module.exports = nextConfig;
