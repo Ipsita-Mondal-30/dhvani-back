@@ -29,6 +29,20 @@ model PDFDocument {
   @@map("pdf_documents")
 }
 
+model SOSLog {
+  id        String   @id @default(cuid())
+  userId    String?  // Optional user identification
+  latitude  Float
+  longitude Float
+  status    String   // "SMS Sent", "Failed", "Permission Denied", etc.
+  message   String?  // The emergency message sent
+  timestamp DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("sos_logs")
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
