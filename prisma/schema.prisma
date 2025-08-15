@@ -9,11 +9,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
-
 
 model PDFDocument {
   id            String   @id @default(cuid())
@@ -51,4 +49,20 @@ model User {
   updatedAt DateTime @updatedAt
 
   @@map("users")
+}
+
+model CurrencyDetection {
+  id           String   @id @default(cuid())
+  userId       String?  // Optional user identification
+  denomination Int      // The detected denomination (10, 20, 50, 100, 200, 500, 2000)
+  confidence   Float?   // Confidence score from Vision API (0-1)
+  detectedText String?  // Raw text detected by Vision API
+  imageUri     String?  // Local image path/URI (optional)
+  latitude     Float?   // Location where detection happened
+  longitude    Float?   // Location where detection happened
+  timestamp    DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("currency_detections")
 }

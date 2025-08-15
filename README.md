@@ -10,6 +10,9 @@ A Next.js backend service for extracting text from PDF files using Node.js libra
 - 🔄 RESTful API endpoints
 - 💾 Prisma ORM for database operations
 - 🎨 Beautiful frontend interface for testing
+- 🌐 **Multilingual support** with automatic translation (English, Hindi, Bengali)
+- 🎤 **Text-to-Speech** with language-appropriate voices
+- 🔄 **Translation API** powered by Google Cloud Translate
 
 ## Tech Stack
 
@@ -24,7 +27,7 @@ A Next.js backend service for extracting text from PDF files using Node.js libra
 
 ### 1. Environment Variables
 
-Create a `.env.local` file in the root directory with your Supabase credentials:
+Create a `.env.local` file in the root directory with your credentials:
 
 ```env
 # Supabase Configuration
@@ -35,6 +38,10 @@ SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 # Database Configuration
 DATABASE_URL="postgresql://postgres.hwedozsnqfayouumvvyq:[YOUR-PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
 DIRECT_URL="postgresql://postgres.hwedozsnqfayouumvvyq:[YOUR-PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres"
+
+# Google Cloud Configuration (for Translation & TTS)
+GOOGLE_CLOUD_PROJECT_ID=your-project-id
+GCP_API_KEY=your-gcp-api-key
 ```
 
 **Important**: Replace `[YOUR-PASSWORD]` with your actual Supabase database password.
@@ -70,47 +77,88 @@ The application will be available at `http://localhost:3000`
 
 ## API Endpoints
 
-### POST /api/pdf/upload
+### PDF Endpoints
 
+#### POST /api/pdf/upload
 Upload a PDF file and extract text.
 
-**Request**: FormData with `file` field
-**Response**:
+#### GET /api/pdf
+Get all PDF documents.
 
+#### GET /api/pdf/[id]
+Get a specific PDF document by ID.
+
+#### DELETE /api/pdf/[id]
+Delete a PDF document by ID.
+
+### Multilingual Endpoints
+
+#### GET /api/messages
+Get localized messages and instructions.
+
+**Query Parameters:**
+- `lang`: Language code (`en`, `hi`, `bn`)
+- `type`: Message type (`welcome`, `instructions`, `features`)
+
+**Example:**
+```bash
+GET /api/messages?type=welcome&lang=hi
+```
+
+#### POST /api/messages
+Translate custom text.
+
+**Request Body:**
 ```json
 {
-  "success": true,
-  "document": {
-    "id": "document-id",
-    "filename": "example.pdf",
-    "originalName": "example.pdf",
-    "fileSize": 12345,
-    "extractedText": "Extracted text content...",
-    "createdAt": "2024-01-01T00:00:00.000Z"
+  "text": "Your text here",
+  "targetLanguage": "hi"
+}
+```
+
+#### POST /api/tts
+Enhanced Text-to-Speech with automatic translation.
+
+**Request Body:**
+```json
+{
+  "text": "Hello world",
+  "targetLanguage": "hi",
+  "config": {
+    "voice": {
+      "ssmlGender": "FEMALE"
+    }
   }
 }
 ```
 
-### GET /api/pdf
+**Headers:**
+- `x-language`: Preferred language
+- `X-Translation-Info`: Translation metadata (response)
 
-Get all PDF documents.
+## Multilingual Support
 
-**Response**:
+The API supports **English (en)**, **Hindi (hi)**, and **Bengali (bn)**.
 
-```json
-{
-  "success": true,
-  "documents": [...]
-}
+### How to Request Data in Different Languages
+
+1. **Query Parameter**: `?lang=hi`
+2. **Request Header**: `x-language: bn`
+3. **Request Body**: `"targetLanguage": "hi"`
+
+**Example:**
+```bash
+# Get welcome message in Hindi
+curl "http://localhost:3000/api/messages?type=welcome&lang=hi"
+
+# Generate speech in Bengali
+curl -X POST "http://localhost:3000/api/tts" \
+  -H "Content-Type: application/json" \
+  -H "x-language: bn" \
+  -d '{"text": "Welcome to our application"}'
 ```
 
-### GET /api/pdf/[id]
-
-Get a specific PDF document by ID.
-
-### DELETE /api/pdf/[id]
-
-Delete a PDF document by ID.
+For detailed multilingual API documentation, see [MULTILINGUAL_API.md](./MULTILINGUAL_API.md).
 
 ## Database Schema
 
